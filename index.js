@@ -2,6 +2,7 @@ const express = require('express')
 const movieRoute = require('./movieRoute')
 require("dotenv/config")
 const mongoose = require('mongoose')
+const PORT = process.env.PORT || 5555;
 
 const app = express(); 
 
@@ -19,6 +20,6 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
     process.exit(1);
   });
 
-app.listen(5555, ()=>{  
+app.listen(PORT, ()=>{  
     console.log('Server running on 5555 port')
 })
