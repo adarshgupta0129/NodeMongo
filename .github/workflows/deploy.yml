@@ -1,0 +1,47 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      MONGO_URI: ${{ secrets.MONGO_URI }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run tests (if any)
+      run: echo "No tests yet"
+
+    - name: Build Docker image
+      run: docker build -t node-api .
+
+    - name: Login to AWS
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Deploy to Elastic Beanstalk
+      run: |
+        zip -r node-api.zip . -x "*.git*"
+        aws elasticbeanstalk create-application-version --application-name node-api \
+          --version-label v-${{ github.run_number }} \
+          --source-bundle S3Bucket="your-s3-bucket",S3Key="node-api.zip"
+        aws elasticbeanstalk update-environment --environment-name node-api-env \
+          --version-label v-${{ github.run_number }}
