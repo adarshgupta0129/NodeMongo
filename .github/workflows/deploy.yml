@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Deploy to AWS EB
 
 on:
   push:
@@ -6,42 +6,31 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
-    env:
-      MONGO_URI: ${{ secrets.MONGO_URI }}
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install Dependencies
+        run: npm install
 
-    - name: Run tests (if any)
-      run: echo "No tests yet"
+      - name: Zip App for EB
+        run: zip -r app.zip . -x '*.git*'
 
-    - name: Build Docker image
-      run: docker build -t node-api .
-
-    - name: Login to AWS
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
-
-    - name: Deploy to Elastic Beanstalk
-      run: |
-        zip -r node-api.zip . -x "*.git*"
-        aws elasticbeanstalk create-application-version --application-name node-api \
-          --version-label v-${{ github.run_number }} \
-          --source-bundle S3Bucket="your-s3-bucket",S3Key="node-api.zip"
-        aws elasticbeanstalk update-environment --environment-name node-api-env \
-          --version-label v-${{ github.run_number }}
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ secrets.EB_APP_NAME }}
+          environment_name: ${{ secrets.EB_ENV_NAME }}
+          version_label: ${{ github.sha }}
+          region: ${{ secrets.AWS_REGION }}
+          deployment_package: app.zip

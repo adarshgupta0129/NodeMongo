@@ -1,0 +1,9 @@
+branch-defaults:
+  main:
+    environment: ${{ secrets.EB_ENV_NAME }}
+    group_suffix: null
+global:
+  application_name: ${{ secrets.EB_APP_NAME }}
+  default_region: ${{ secrets.AWS_REGION }}
+  profile: null
+  workspace_type: Application
