@@ -1,12 +1,13 @@
 const express = require('express')
-const movieRoute = require('./movieRoute')
+const { movieRoute, checkSystem } = require('./movieRoute')
 require("dotenv/config")
 const mongoose = require('mongoose')
 const PORT = process.env.PORT || 5555;
 
 const app = express(); 
-
 app.use("/movies", movieRoute)
+
+app.use("/", checkSystem)
 
 //Mongoose DB connection
 

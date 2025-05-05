@@ -1,6 +1,6 @@
 const Movie = require('./movieModel')
 
-const checkDB = async (req, res) => {
+const checkSystem = async (req, res) => {
     try {
         res.status(200).json({ success: true, data: 'Server is running!!!' })
     }
@@ -72,4 +72,4 @@ const updateMovie = async (req, res) => {
     }
 }
 
-module.exports = { checkDB, addMovie, showMovies, showMovie, removeMovie, updateMovie }; 
+module.exports = { checkSystem, addMovie, showMovies, showMovie, removeMovie, updateMovie }; 
