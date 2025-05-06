@@ -1,5 +1,5 @@
 branch-defaults:
-  main:
+  master:
     environment: ${{ secrets.EB_ENV_NAME }}
     group_suffix: null
 global:
