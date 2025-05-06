@@ -20,5 +20,5 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
   });
 
 app.listen(PORT, ()=>{  
-    console.log('Server running on 5555 port')
+  console.log(`✅ Server running on port ${PORT}`);
 })
